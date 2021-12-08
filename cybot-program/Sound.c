@@ -8,6 +8,9 @@
 #include "open_interface.h"
 #include "Sound.h"
 
+/**
+ * Loads 3 different songs and selects one to play.
+ */
 void play_sound(int num)
 {
 

@@ -13,6 +13,7 @@
 #include "Sound.h"
 #include "cliff.h"
 
+//Which CyBot we're using
 #define CYBOT_3
 
 #ifdef CYBOT_3
@@ -23,21 +24,28 @@
     #define CLIFF_MAX 2500
 #endif
 
+
 #ifdef CYBOT_9
     #define PING_MOD 969.33
-    #define SERVO_CALIBRATION -18
-
+    #define SERVO_CALIBRATION -24
+    #define SERVO_COEFFICIENT 1.17
     #define CLIFF_MIN 1000
     #define CLIFF_MAX 2700
 #endif
 
-extern volatile bool inAction;
+
 bool isFast = false;
 int speed = 50;
 
+/**
+ * Take scan readings from current servo position.
+ * Averages IR sensor, and transmits to client.
+ */
 void scanInfront(char* uartTX)
 {
     lcd_clear();
+
+    //Do additional software averaging
 
     double avg_val;
     int j;
@@ -56,6 +64,10 @@ void scanInfront(char* uartTX)
     lcd_puts(uartTX);
 }
 
+/**
+ * Autocalibration for motors. Uses left and right encoders to calculate calibration values.
+ *
+ */
 void calibrateMotors(oi_t *sensor) {
     int leftEncoderVal = sensor->leftEncoderCount;
     int rightEncoderVal = sensor->rightEncoderCount;
@@ -70,7 +82,7 @@ void calibrateMotors(oi_t *sensor) {
     rightEncoderVal -= sensor->rightEncoderCount;
 
     printf("%f %f", 1.0, (leftEncoderVal / rightEncoderVal));
-    oi_setMotorCalibration(1.0,  (((float) leftEncoderVal) / rightEncoderVal) );
+    oi_setMotorCalibration(1.0,  (((float) leftEncoderVal) / rightEncoderVal));
 }
 
 void main() {
@@ -93,7 +105,6 @@ void main() {
 
     unsigned int lastCliffData = 0b00000000;
 
-    //bool inAction = false;
     char uartRX;                // var to hold uart RX data
     char uartTX[50] = "";       // string to hold uart TX data
 
@@ -163,11 +174,9 @@ void main() {
             if (inAction)
             {
                 oi_setWheels(0, 0);
-                //inAction = false;
             } else
             {
                 oi_setWheels(speed, speed);
-                //inAction = true;
             }
             break;
         }
@@ -176,11 +185,9 @@ void main() {
             if (inAction)
             {
                 oi_setWheels(0, 0);
-                //inAction = false;
             } else
             {
                 oi_setWheels(-speed, -speed);
-                //inAction = true;
             }
             break;
         }
@@ -189,11 +196,9 @@ void main() {
             if (inAction)
             {
                 oi_setWheels(0, 0);
-                //inAction = false;
             } else
             {
                 oi_setWheels(speed, -speed);
-                //inAction = true;
             }
             break;
         }
@@ -202,21 +207,19 @@ void main() {
             if (inAction)
             {
                 oi_setWheels(0, 0);
-                //inAction = false;
             } else
             {
                 oi_setWheels(-speed, speed);
-                //inAction = true;
             }
             break;
         }
-        case 'm': // scan
+        case 'm': // scan once at 90 degrees
         {
             servo_move(90.0);
             scanInfront(uartTX);
             break;
         }
-        case 'n': // scan
+        case 'n': // scan 180 degrees
         {
             servo_move(0);
             timer_waitMillis(750);
@@ -224,7 +227,6 @@ void main() {
             for ( i = 0; i < 180; i++) {
                 scanInfront(uartTX);
                 servo_move(i);
-                //timer_waitMillis(40);
             }
             break;
         }

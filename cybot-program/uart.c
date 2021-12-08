@@ -46,6 +46,10 @@ void uart_sendByte(char data){
     while((UART1_FR_R & 0b1000) != 0);
 }
 
+/**
+ * ISR for UART. Also sets inAction if needed,
+ * so it isn't missed during auto-avoid operations.
+ */
 void uart_handler() {
     if (UART1_MIS_R & 0b10000) { //check if a receive byte IRQ has occurred
 
@@ -64,6 +68,10 @@ void uart_handler() {
     }
 }
 
+
+/**
+ * Set interrupt registers.
+ */
 void uart_interrupt_init() {
     //    UART1_IM_R |= 0b110000; //enable send and receive raw interrupts
     //    NVIC_EN0_R |= 0b1000000; // enable interrupt for IRQ 6 / UART1 interrupt
@@ -81,6 +89,9 @@ void uart_interrupt_init() {
     IntRegister(22, uart_handler); //give the microcontroller the address of our interrupt handler - page 104 22 is the vector number
 }
 
+/**
+ * Convenience function to loop over a string and print each byte.
+ */
 void sendUartString( char msg[] ) {
     // send string to UART
     int i = 0;

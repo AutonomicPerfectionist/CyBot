@@ -9,6 +9,10 @@
 
 extern volatile char receive_data;
 
+//Whether we are currently moving,
+//updated in ISR so isn't missed
+extern volatile bool inAction;
+
 // Initialize the UART to communciate between CyBot and PuTTy
 void uart_init(int BAUD_RATE);
 

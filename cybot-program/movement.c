@@ -6,6 +6,9 @@
 #include "lcd.h"
 #include "uart.h"
 
+/**
+ * Moves forward by requested centimeters.
+ */
 double move(oi_t *sensor, int centimeters){
     // moves the bot [centimeters]
     // centimeters > 0 = forwards, centimeters < 0 = backwards
@@ -31,6 +34,9 @@ double move(oi_t *sensor, int centimeters){
     return centimeters;
 }
 
+/**
+ * Turns requested number of degrees.
+ */
 double turn(oi_t *sensor, double degrees){
     // turns the bot [degrees]
     // neg # = right
@@ -58,6 +64,9 @@ double turn(oi_t *sensor, double degrees){
     return degrees;
 }
 
+/**
+ * Moves and automatically avoids any objects detected by bump sensor.
+ */
 void moveAndAvoid(oi_t *sensor, double returnDist) {
     int sideOffset = 0;
     float totalDist = 0;

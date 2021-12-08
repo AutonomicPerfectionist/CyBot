@@ -8,6 +8,10 @@
 int cliff_min = 500;
 int cliff_max = 2500;
 
+/**
+ * Loops through all cliff sensors, determines if not floor, and transmits
+ * to client.
+ */
 unsigned int updateCliffStatus(oi_t *sensor) {
     unsigned int cliffReturn = 0b00000000;
     unsigned int cliffData[4] = {sensor->cliffLeftSignal,
@@ -30,6 +34,9 @@ unsigned int updateCliffStatus(oi_t *sensor) {
     return cliffReturn;
 }
 
+/**
+ * Sets calibration values for cliff/line detection.
+ */
 void cliff_set_calibration(int min, int max) {
     cliff_min = min;
     cliff_max = max;
